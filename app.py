@@ -1,4 +1,9 @@
 # coding: utf-8
+import uuid
+import requests
+SUPABASE_URL = "https://tqxrfbjzfuqeorgvndve.supabase.co"
+SUPABASE_KEY = "sb_publishable_Jayhk0qbNe3klwk55y1oaA_YqL8kSRV"
+
 import os
 from flask import Flask, render_template, request, jsonify, session
 import anthropic
@@ -91,6 +96,10 @@ def diagnose():
     except:
         result = {"character": "羅針盤", "adj1": "慎重で", "adj2": "芯のある", "strength": "分析力があります", "personality": "じっくり考えるタイプです", "message": "あなたらしく進もう"}
     session["result"] = result
+    slug = str(uuid.uuid4())[:8]
+    requests.post(SUPABASE_URL + "/rest/v1/result", headers={"apikey": SUPABASE_KEY, "Content-Type": "application/json"}, json={"slug": slug, "nickname": nickname, "mbti": mbti, "character": result.get("character",""), "adj1": result.get("adj1",""), "adj2": result.get("adj2",""), "strength": result.get("strength",""), "personality": result.get("personality",""), "message": result.get("message","")})
+    session["slug"] = slug
+
     return render_template("result.html", result=result, nickname=nickname)
 
 if __name__ == "__main__":
