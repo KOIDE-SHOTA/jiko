@@ -5,6 +5,9 @@ SUPABASE_URL = "https://tqxrfbjzfuqeorgvndve.supabase.co"
 SUPABASE_KEY = "sb_publishable_Jayhk0qbNe3klwk55y1oaA_YqL8kSRV"
 
 import os
+from PIL import Image, ImageDraw, ImageFont
+import io
+
 from flask import Flask, render_template, request, jsonify, session
 import anthropic
 from dotenv import load_dotenv
@@ -80,6 +83,17 @@ def message():
         history.append({"role": "assistant", "content": reply})
         session["history"] = history
         return jsonify({"message": reply, "question_index": next_index, "done": False})
+def generate_ogp(adj1, adj2, character, message):
+    img = Image.new("RGB", (1200, 630), color="#f0e6f6")
+    draw = ImageDraw.Draw(img)
+    draw.rectangle([0, 0, 1200, 630], fill="#f0e6f6")
+    draw.text((600, 200), adj1 + adj2 + " " + character, fill="#9575cd", anchor="mm")
+    draw.text((600, 350), message, fill="#555555", anchor="mm")
+    draw.text((600, 500), "jikoキャラ診断", fill="#ce93d8", anchor="mm")
+    buf = io.BytesIO()
+    img.save(buf, format="PNG")
+    buf.seek(0)
+    return buf
 
 @app.route("/diagnose")
 def diagnose():
@@ -99,9 +113,19 @@ def diagnose():
     slug = str(uuid.uuid4())[:8]
     requests.post(SUPABASE_URL + "/rest/v1/result", headers={"apikey": SUPABASE_KEY, "Content-Type": "application/json"}, json={"slug": slug, "nickname": nickname, "mbti": mbti, "character": result.get("character",""), "adj1": result.get("adj1",""), "adj2": result.get("adj2",""), "strength": result.get("strength",""), "personality": result.get("personality",""), "message": result.get("message","")})
     session["slug"] = slug
+    ogp_buf = generate_ogp(result.get("adj1",""), result.get("adj2",""), result.get("character",""), result.get("message",""))
+    session["ogp"] = ogp_buf.getvalue().hex()
 
-    return render_template("result.html", result=result, nickname=nickname)
+    return render_template("result.html", result=result, nickname=nickname, slug=session.get("slug",""))
+ 
+@app.route("/ogp/<slug>.png")
+def ogp_image(slug):
+    from flask import send_file
+    ogp_hex = session.get("ogp", "")
+    if not ogp_hex:
+        return "", 404
+    buf = io.BytesIO(bytes.fromhex(ogp_hex))
+    return send_file(buf, mimetype="image/png")
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
-
