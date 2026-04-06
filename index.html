@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>jikoキャラ診断</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: sans-serif; background: linear-gradient(135deg, #fce4ec, #e8eaf6); min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+.container { background: white; border-radius: 24px; padding: 40px 32px; width: 90%; max-width: 420px; box-shadow: 0 8px 32px rgba(0,0,0,0.08); text-align: center; }
+.logo { font-size: 28px; font-weight: 800; color: #ce93d8; margin-bottom: 8px; }
+.subtitle { color: #888; font-size: 13px; margin-bottom: 32px; }
+.step { display: none; }
+.step.active { display: block; }
+label { display: block; text-align: left; font-size: 14px; color: #555; margin-bottom: 8px; font-weight: 600; }
+input[type="text"] { width: 100%; padding: 14px 16px; border: 2px solid #f0e6f6; border-radius: 12px; font-size: 16px; outline: none; color: #333; }
+.btn { width: 100%; padding: 15px; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 20px; background: linear-gradient(90deg, #f48fb1, #ce93d8); color: white; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="logo">jikoキャラ診断</div>
+<p class="subtitle">あなただけのキャラクターを見つけよう</p>
+<div class="step active" id="step1">
+<label>ニックネームを入力してね</label>
+<input type="text" id="nickname" placeholder="例：たろう" maxlength="20">
+<button class="btn" onclick="goStep2()">次へ</button>
+</div>
+<div class="step" id="step2">
+<label>MBTIタイプを選んでね</label>
+<div id="mbtiGrid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:8px"></div>
+<button class="btn" id="mbtiNextBtn" onclick="startChat()" style="opacity:0.4;pointer-events:none">診断スタート</button>
+</div>
+</div>
+<script>
+const MBTI_LIST = ["INTJ","INTP","ENTJ","ENTP","INFJ","INFP","ENFJ","ENFP","ISTJ","ISFJ","ESTJ","ESFJ","ISTP","ISFP","ESTP","ESFP","不明"];
+let selectedMBTI = "";
+const grid = document.getElementById("mbtiGrid");
+MBTI_LIST.forEach(m => {
+  const btn = document.createElement("button");
+  btn.textContent = m;
+  btn.style.cssText = "padding:10px 4px;border:2px solid #f0e6f6;border-radius:10px;background:white;font-size:12px;font-weight:700;color:#9575cd;cursor:pointer";
+  btn.onclick = () => { document.querySelectorAll("#mbtiGrid button").forEach(b => b.style.background="white"); btn.style.background="#ce93d8"; btn.style.color="white"; selectedMBTI = m; document.getElementById("mbtiNextBtn").style.opacity="1"; document.getElementById("mbtiNextBtn").style.pointerEvents="auto"; };
+  grid.appendChild(btn);
+});
+function goStep2() {
+  if (!document.getElementById("nickname").value.trim()) { alert("ニックネームを入力してね"); return; }
+  document.getElementById("step1").classList.remove("active");
+  document.getElementById("step2").classList.add("active");
+}
+async function startChat() {
+  const nickname = document.getElementById("nickname").value.trim();
+  const res = await fetch("/api/start", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({nickname,mbti:selectedMBTI})});
+  const data = await res.json();
+  localStorage.setItem("firstMessage", data.message);
+  window.location.href = "/chat";
+}
+</script>
+</body>
+</html>

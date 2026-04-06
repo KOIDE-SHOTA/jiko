@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>診断結果</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: sans-serif; background: linear-gradient(135deg, #fce4ec, #e8eaf6); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.card { background: white; border-radius: 24px; padding: 40px 32px; width: 90%; max-width: 480px; box-shadow: 0 8px 32px rgba(0,0,0,0.08); text-align: center; }
+.nickname { color: #aaa; font-size: 14px; margin-bottom: 8px; }
+.character { font-size: 26px; font-weight: 800; color: #ce93d8; margin-bottom: 24px; }
+.image { width: 120px; height: 120px; background: #f0e6f6; border-radius: 50%; margin: 0 auto 24px; display: flex; align-items: center; justify-content: center; font-size: 48px; }
+.section { text-align: left; margin-bottom: 20px; }
+.section h3 { font-size: 13px; color: #ce93d8; font-weight: 700; margin-bottom: 6px; }
+.section p { font-size: 14px; color: #555; line-height: 1.7; }
+.message-box { background: linear-gradient(135deg, #fce4ec, #e8eaf6); border-radius: 16px; padding: 16px; margin-top: 24px; font-size: 15px; color: #555; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="card">
+  <p class="nickname">{{ nickname }}さんの診断結果</p>
+  <div class="character">{{ result.adj1 }}{{ result.adj2 }} {{ result.character }}</div>
+  <div class="image">?</div>
+  <div class="section">
+    <h3>強み</h3>
+    <p>{{ result.strength }}</p>
+  </div>
+  <div class="section">
+    <h3>性格特徴</h3>
+    <p>{{ result.personality }}</p>
+  </div>
+  <div class="message-box">{{ result.message }}</div>
+</div>
+</body>
+</html>

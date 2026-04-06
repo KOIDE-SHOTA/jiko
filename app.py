@@ -1,0 +1,98 @@
+# coding: utf-8
+import os
+from flask import Flask, render_template, request, jsonify, session
+import anthropic
+from dotenv import load_dotenv
+load_dotenv()
+
+app = Flask(__name__, template_folder=".")
+app.secret_key = os.environ.get("SECRET_KEY", "jiko-secret")
+client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
+
+QUESTIONS = [
+    "まず、あなたが今まで一番頑張ったことを教えてください",
+    "その経験の中で、一番大変だったことは何でしたか",
+    "普段、何かを決めるときってどんなふうに考えますか",
+    "友達や周りの人からこういう人だよねって言われることはありますか",
+    "あなたが一番得意なことや自然とできちゃうことって何ですか",
+    "逆に苦手なことやここちょっと弱いなと感じることはありますか",
+    "将来どんなふうに働きたいというイメージはありますか",
+    "就活や自己分析を通じて一番知りたいことを教えてください"
+]
+
+SYSTEM_PROMPT = "You are a friendly Japanese AI assistant helping job-seeking students with self-analysis. Respond in Japanese, warmly and concisely in 3-5 lines."
+
+@app.route("/")
+def index():
+    session.clear()
+    return render_template("index.html")
+
+@app.route("/chat")
+def chat():
+    return render_template("chat.html")
+
+@app.route("/api/start", methods=["POST"])
+def start():
+    data = request.json
+    nickname = data.get("nickname", "あなた")
+    mbti = data.get("mbti", "")
+    session["nickname"] = nickname
+    session["mbti"] = mbti
+    session["question_index"] = 0
+    session["history"] = []
+    session["state"] = "waiting_answer"
+    first_q = QUESTIONS[0]
+    welcome = "よろしく、" + nickname + "さん！MBTIは" + mbti + "なんだね。8つの質問に答えてね！\n\n" + first_q
+    return jsonify({"message": welcome, "question_index": 0})
+
+@app.route("/api/message", methods=["POST"])
+def message():
+    data = request.json
+    user_message = data.get("message", "")
+    q_index = session.get("question_index", 0)
+    history = session.get("history", [])
+    state = session.get("state", "waiting_answer")
+    history.append({"role": "user", "content": user_message})
+    session["history"] = history
+    if state == "waiting_answer":
+        session["state"] = "waiting_followup"
+        prompt = "ユーザーが「" + QUESTIONS[q_index] + "」に「" + user_message + "」と答えました。深掘り質問を1つだけ短く聞いてください。"
+        response = client.messages.create(model="claude-sonnet-4-20250514", max_tokens=200, system=SYSTEM_PROMPT, messages=[{"role": "user", "content": prompt}])
+        reply = response.content[0].text
+        history.append({"role": "assistant", "content": reply})
+        session["history"] = history
+        return jsonify({"message": reply, "question_index": q_index, "done": False})
+    else:
+        session["state"] = "waiting_answer"
+        next_index = q_index + 1
+        session["question_index"] = next_index
+        if next_index >= 8:
+            return jsonify({"message": "全部答えてくれてありがとう！診断してみよう", "question_index": 8, "done": True})
+        next_q = QUESTIONS[next_index]
+        prompt = "一言で受け止めて、次の質問に自然につなげてください。質問：" + next_q
+        response = client.messages.create(model="claude-sonnet-4-20250514", max_tokens=200, system=SYSTEM_PROMPT, messages=[{"role": "user", "content": prompt}])
+        reply = response.content[0].text
+        history.append({"role": "assistant", "content": reply})
+        session["history"] = history
+        return jsonify({"message": reply, "question_index": next_index, "done": False})
+
+@app.route("/diagnose")
+def diagnose():
+    history = session.get("history", [])
+    mbti = session.get("mbti", "")
+    nickname = session.get("nickname", "あなた")
+    conv = "\n".join([m["role"] + ": " + m["content"] for m in history])
+    prompt = "以下は就活生との会話です。MBTIは" + mbti + "です。\n\n" + conv + "\n\nこの人のキャラクターを以下の形式でJSONのみで返してください。{\"character\": \"羅針盤\", \"adj1\": \"慎重で\", \"adj2\": \"芯のある\", \"strength\": \"強みの説明\", \"personality\": \"性格特徴の説明\", \"message\": \"一言メッセージ\"}"
+    response = client.messages.create(model="claude-sonnet-4-20250514", max_tokens=500, system="You are a character diagnosis AI. Return only valid JSON.", messages=[{"role": "user", "content": prompt}])
+    import json
+    text = response.content[0].text
+    try:
+        result = json.loads(text)
+    except:
+        result = {"character": "羅針盤", "adj1": "慎重で", "adj2": "芯のある", "strength": "分析力があります", "personality": "じっくり考えるタイプです", "message": "あなたらしく進もう"}
+    session["result"] = result
+    return render_template("result.html", result=result, nickname=nickname)
+
+if __name__ == "__main__":
+    app.run(debug=True, port=5000)
+
