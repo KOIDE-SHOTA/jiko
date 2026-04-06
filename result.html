@@ -36,5 +36,14 @@ body { font-family: sans-serif; background: linear-gradient(135deg, #fce4ec, #e8
   </div>
   <div class="message-box">{{ result.message }}</div>
 </div>
+<div style="text-align:center;margin-top:24px">
+<p style="color:#aaa;font-size:13px">あなたの診断結果URL</p>
+<p style="color:#9575cd;font-size:13px">{{ request.host_url }}result/{{ slug }}</p>
+</div>
+<script>
+const slug = "{{ slug }}";
+if (slug) localStorage.setItem("lastSlug", slug);
+</script>
+
 </body>
 </html>

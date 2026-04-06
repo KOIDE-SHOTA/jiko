@@ -126,6 +126,16 @@ def ogp_image(slug):
         return "", 404
     buf = io.BytesIO(bytes.fromhex(ogp_hex))
     return send_file(buf, mimetype="image/png")
+@app.route("/result/<slug>")
+def result_page(slug):
+    import requests as req
+    res = req.get(SUPABASE_URL + "/rest/v1/result?slug=eq." + slug, headers={"apikey": SUPABASE_KEY})
+    data = res.json()
+    if not data:
+        return "結果が見つかりません", 404
+    row = data[0]
+    result = {"character": row["character"], "adj1": row["adj1"], "adj2": row["adj2"], "strength": row["strength"], "personality": row["personality"], "message": row["message"]}
+    return render_template("result.html", result=result, nickname=row["nickname"], slug=slug)
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)

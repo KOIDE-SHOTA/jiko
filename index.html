@@ -55,6 +55,13 @@ async function startChat() {
   localStorage.setItem("firstMessage", data.message);
   window.location.href = "/chat";
 }
+const prevSlug = localStorage.getItem("lastSlug");
+if (prevSlug) {
+  const link = document.getElementById("prevLink");
+  link.href = "/result/" + prevSlug;
+  link.style.display = "block";
+}
+
 </script>
 </body>
 </html>
