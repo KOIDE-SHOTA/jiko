@@ -3,11 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>jikoキャラ診断 | あなたの就活キャラクターを発見しよう</title>
-  <meta name="description" content="MBTIとAI対話で、あなただけのRPGキャラクターを診断。就活の自己分析を、冒険に変えよう。">
-  <meta property="og:title" content="jikoキャラ診断">
-  <meta property="og:description" content="MBTIとAI対話で、あなただけのRPGキャラクターを診断。">
-  <meta property="og:image" content="/static/ogp_default.png">
+  <title>jikoキャラ診断</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Noto+Serif+JP:wght@300;400;700&display=swap" rel="stylesheet">
@@ -19,137 +15,78 @@
       --gold: #d4af37;
       --gold-light: #f0d060;
       --gold-dim: #8a7020;
-      --amber: #c27c1a;
       --text-primary: #f0e8cc;
       --text-secondary: #b8a880;
       --text-dim: #6a5f45;
       --border: rgba(212,175,55,0.25);
-      --border-bright: rgba(212,175,55,0.6);
       --glow: 0 0 20px rgba(212,175,55,0.3);
       --glow-strong: 0 0 40px rgba(212,175,55,0.5);
     }
-
     * { margin: 0; padding: 0; box-sizing: border-box; }
-
     body {
       background: var(--bg-deep);
       color: var(--text-primary);
       font-family: 'Noto Serif JP', serif;
       min-height: 100vh;
-      overflow-x: hidden;
     }
-
-    .stars {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 0;
-    }
+    .stars { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
     .star {
-      position: absolute;
-      border-radius: 50%;
-      background: white;
-      animation: twinkle var(--dur, 3s) ease-in-out infinite var(--delay, 0s);
+      position: absolute; border-radius: 50%; background: white;
+      animation: twinkle var(--dur,3s) ease-in-out infinite var(--delay,0s);
     }
     @keyframes twinkle {
-      0%, 100% { opacity: 0.2; transform: scale(1); }
-      50% { opacity: 1; transform: scale(1.3); }
+      0%,100%{opacity:0.2;} 50%{opacity:1;}
     }
 
-    .hero {
+    /* ── ページ共通 ── */
+    .page {
+      display: none;
       position: relative;
       z-index: 1;
       min-height: 100vh;
-      display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       padding: 40px 24px;
       text-align: center;
     }
+    .page.active { display: flex; }
 
-    .emblem {
-      width: 80px;
-      height: 80px;
-      margin-bottom: 32px;
-      animation: float 4s ease-in-out infinite;
-    }
-    @keyframes float {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-10px); }
-    }
-    .emblem svg { width: 100%; height: 100%; }
-
-    .subtitle-top {
-      font-family: 'Cinzel', serif;
-      font-size: 11px;
-      letter-spacing: 4px;
-      color: var(--gold-dim);
-      text-transform: uppercase;
-      margin-bottom: 16px;
-      animation: fadeInDown 1s ease both;
-    }
-
+    /* ── ロゴ共通 ── */
     .logo {
       font-family: 'Cinzel', serif;
-      font-size: clamp(40px, 8vw, 72px);
+      font-size: clamp(36px, 8vw, 64px);
       font-weight: 900;
       color: var(--gold);
       text-shadow: var(--glow-strong);
-      letter-spacing: 2px;
-      animation: fadeInDown 1s ease 0.2s both;
       line-height: 1.1;
+      margin-bottom: 8px;
     }
-
     .logo-jp {
-      font-size: clamp(14px, 3vw, 20px);
-      font-weight: 300;
+      font-size: 14px;
       color: var(--text-secondary);
-      letter-spacing: 6px;
-      margin-top: 8px;
-      animation: fadeInDown 1s ease 0.4s both;
-      font-family: 'Noto Serif JP', serif;
+      letter-spacing: 4px;
+      margin-bottom: 32px;
     }
-
     .divider {
-      width: 200px;
-      height: 1px;
+      width: 200px; height: 1px;
       background: linear-gradient(90deg, transparent, var(--gold), transparent);
-      margin: 28px auto;
-      animation: fadeIn 1s ease 0.6s both;
+      margin: 0 auto 32px;
     }
 
-    .hero-desc {
-      font-size: clamp(14px, 2.5vw, 17px);
-      color: var(--text-secondary);
-      line-height: 2;
-      max-width: 520px;
-      margin-bottom: 48px;
-      animation: fadeIn 1s ease 0.8s both;
-    }
-
-    .start-section {
-      width: 100%;
-      max-width: 480px;
-      animation: fadeInUp 1s ease 1s both;
-    }
-
-    .input-wrap {
-      margin-bottom: 20px;
-    }
-
+    /* ── Page1: ニックネーム ── */
     .input-label {
+      font-family: 'Cinzel', serif;
       font-size: 11px;
       letter-spacing: 3px;
       color: var(--gold-dim);
       text-transform: uppercase;
       margin-bottom: 8px;
       display: block;
-      font-family: 'Cinzel', serif;
     }
-
     input[type="text"] {
       width: 100%;
+      max-width: 400px;
       padding: 16px 20px;
       background: var(--bg-card);
       border: 1px solid var(--border);
@@ -158,6 +95,7 @@
       font-size: 16px;
       font-family: 'Noto Serif JP', serif;
       outline: none;
+      margin-bottom: 20px;
       transition: border-color 0.3s, box-shadow 0.3s;
     }
     input[type="text"]:focus {
@@ -166,25 +104,42 @@
     }
     input[type="text"]::placeholder { color: var(--text-dim); }
 
-    .mbti-section {
-      margin-bottom: 20px;
-    }
-    .mbti-label {
-      font-size: 11px;
-      letter-spacing: 3px;
-      color: var(--gold-dim);
-      text-transform: uppercase;
-      margin-bottom: 12px;
-      display: block;
+    .next-btn {
+      width: 100%;
+      max-width: 400px;
+      padding: 16px;
+      background: transparent;
+      border: 2px solid var(--gold);
+      border-radius: 4px;
+      color: var(--gold);
+      font-size: 16px;
       font-family: 'Cinzel', serif;
+      letter-spacing: 4px;
+      cursor: pointer;
+      transition: all 0.3s;
     }
+    .next-btn:hover:not(:disabled) {
+      background: var(--gold);
+      color: var(--bg-deep);
+      box-shadow: var(--glow-strong);
+    }
+    .next-btn:disabled {
+      border-color: var(--text-dim);
+      color: var(--text-dim);
+      cursor: not-allowed;
+    }
+
+    /* ── Page2: MBTI ── */
     .mbti-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
+      gap: 10px;
+      width: 100%;
+      max-width: 440px;
+      margin: 0 auto;
     }
     .mbti-btn {
-      padding: 10px 4px;
+      padding: 12px 4px;
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: 4px;
@@ -198,7 +153,6 @@
     .mbti-btn:hover {
       border-color: var(--gold);
       color: var(--gold);
-      box-shadow: var(--glow);
     }
     .mbti-btn.selected {
       background: var(--gold);
@@ -208,49 +162,9 @@
       box-shadow: var(--glow-strong);
     }
 
-    .selected-mbti-display {
-      text-align: center;
-      font-size: 13px;
-      color: var(--text-dim);
-      margin-top: 8px;
-      min-height: 20px;
-    }
-    .selected-mbti-display span {
-      color: var(--gold);
-      font-family: 'Cinzel', serif;
-    }
-
-    .start-btn {
-      width: 100%;
-      padding: 18px;
-      background: transparent;
-      border: 2px solid var(--gold);
-      border-radius: 4px;
-      color: var(--gold);
-      font-size: 16px;
-      font-family: 'Cinzel', serif;
-      letter-spacing: 4px;
-      cursor: pointer;
-      transition: all 0.3s;
-      text-transform: uppercase;
-      margin-top: 8px;
-    }
-    .start-btn:hover:not(:disabled) {
-      background: var(--gold);
-      color: var(--bg-deep);
-      box-shadow: var(--glow-strong);
-      transform: translateY(-1px);
-    }
-    .start-btn:disabled {
-      border-color: var(--text-dim);
-      color: var(--text-dim);
-      cursor: not-allowed;
-    }
-
     .past-link {
       display: block;
-      text-align: center;
-      margin-top: 20px;
+      margin-top: 24px;
       font-size: 12px;
       color: var(--text-dim);
       text-decoration: none;
@@ -258,120 +172,92 @@
       transition: color 0.2s;
     }
     .past-link:hover { color: var(--gold); }
-
-    .features {
-      position: relative;
-      z-index: 1;
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 40px 24px 80px;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 20px;
-    }
-
-    .feature-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 28px 24px;
-      text-align: center;
-      transition: border-color 0.3s, box-shadow 0.3s;
-    }
-    .feature-card:hover {
-      border-color: var(--gold);
-      box-shadow: var(--glow);
-    }
-    .feature-icon { font-size: 32px; margin-bottom: 12px; }
-    .feature-title {
-      font-family: 'Cinzel', serif;
-      font-size: 13px;
-      color: var(--gold);
-      letter-spacing: 2px;
-      margin-bottom: 8px;
-    }
-    .feature-desc {
-      font-size: 13px;
-      color: var(--text-secondary);
-      line-height: 1.8;
-    }
-
-    @keyframes fadeInDown {
-      from { opacity: 0; transform: translateY(-20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    .error-msg {
-      font-size: 13px;
-      color: #e07070;
-      text-align: center;
-      margin-top: 8px;
-      display: none;
-    }
   </style>
 </head>
 <body>
 
 <div class="stars" id="stars"></div>
 
-<section class="hero">
-  <div class="emblem">
-    <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <polygon points="40,4 48,28 74,28 53,44 61,70 40,55 19,70 27,44 6,28 32,28" fill="none" stroke="#d4af37" stroke-width="2"/>
-      <circle cx="40" cy="40" r="12" fill="none" stroke="#d4af37" stroke-width="1.5"/>
-      <circle cx="40" cy="40" r="4" fill="#d4af37"/>
-    </svg>
-  </div>
-
-  <p class="subtitle-top">RPG × 就活 自己分析</p>
+<!-- Page1: ニックネーム -->
+<div class="page active" id="page1">
   <h1 class="logo">jiko<br>キャラ診断</h1>
   <p class="logo-jp">— あなたの冒険を始めよう —</p>
-
   <div class="divider"></div>
+  <label class="input-label" for="nickname">⚔ ニックネーム</label>
+  <input type="text" id="nickname" placeholder="冒険者の名前を入力..." maxlength="20">
+  <button class="next-btn" id="nextBtn" disabled onclick="goToPage2()">
+    ✦ 冒険を始める ✦
+  </button>
+  <a href="#" class="past-link" id="pastLink" style="display:none">
+    ▷ 前回の診断結果を見る
+  </a>
+</div>
 
-  <p class="hero-desc">
-    MBTIとAIとの対話から、<br>
-    あなただけのRPGキャラクターが生まれる。<br>
-    自己分析を、冒険に変えよう。
-  </p>
+<!-- Page2: MBTI -->
+<div class="page" id="page2">
+  <h1 class="logo">jiko<br>キャラ診断</h1>
+  <p class="logo-jp">— あなたのMBTIを選んでください —</p>
+  <div class="divider"></div>
+  <div class="mbti-grid" id="mbtiGrid"></div>
+</div>
 
-  <div class="start-section">
-    <div class="input-wrap">
-      <label class="input-label" for="nickname">⚔ ニックネーム</label>
-      <input type="text" id="nickname" placeholder="冒険者の名前を入力..." maxlength="20">
-    </div>
+<script>
+  // 星
+  const starsEl = document.getElementById("stars");
+  for (let i = 0; i < 100; i++) {
+    const s = document.createElement("div");
+    s.className = "star";
+    const size = Math.random() * 2.5 + 0.5;
+    s.style.cssText = `width:${size}px;height:${size}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--dur:${2+Math.random()*4}s;--delay:${Math.random()*4}s;`;
+    starsEl.appendChild(s);
+  }
 
-    <div class="mbti-section">
-      <label class="mbti-label">🔮 あなたのMBTI</label>
-      <div class="mbti-grid" id="mbtiGrid"></div>
-      <p class="selected-mbti-display" id="mbtiDisplay">タイプを選んでください</p>
-    </div>
+  // ニックネーム
+  const nicknameInput = document.getElementById("nickname");
+  nicknameInput.addEventListener("input", () => {
+    document.getElementById("nextBtn").disabled = nicknameInput.value.trim().length === 0;
+  });
 
-    <button class="start-btn" id="startBtn" disabled onclick="startAdventure()">
-      ✦ 冒険を始める ✦
-    </button>
-    <p class="error-msg" id="errorMsg">ニックネームとMBTIを入力してください</p>
+  function goToPage2() {
+    const nickname = nicknameInput.value.trim();
+    if (!nickname) return;
+    localStorage.setItem("jiko_nickname", nickname);
+    document.getElementById("page1").classList.remove("active");
+    document.getElementById("page2").classList.add("active");
+  }
 
-    <a href="#" class="past-link" id="pastLink" style="display:none">
-      ▷ 前回の診断結果を見る
-    </a>
-  </div>
-</section>
+  // MBTI
+  const MBTI_TYPES = [
+    "INTJ","INTP","ENTJ","ENTP",
+    "INFJ","INFP","ENFJ","ENFP",
+    "ISTJ","ISFJ","ESTJ","ESFJ",
+    "ISTP","ISFP","ESTP","ESFP"
+  ];
+  const grid = document.getElementById("mbtiGrid");
+  MBTI_TYPES.forEach(type => {
+    const btn = document.createElement("button");
+    btn.className = "mbti-btn";
+    btn.textContent = type;
+    btn.onclick = () => {
+      localStorage.setItem("jiko_mbti", type);
+      fetch("/api/start", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({nickname: localStorage.getItem("jiko_nickname"), mbti: type})
+      }).then(() => {
+        window.location.href = "/chat";
+      });
+    };
+    grid.appendChild(btn);
+  });
 
-<section class="features">
-  <div class="feature-card">
-    <div class="feature-icon">🗺️</div>
-    <p class="feature-title">MBTI × AI対話</p>
-    <p class="feature-desc">16種のMBTIと4問のAI会話で、あなただけのキャラクターを診断</p>
-  </div>
-  <div class="feature-card">
-    <div class="feature-icon">⚔️</div>
-    <p class="feature-title">20種のキャラ
+  // 前回の結果
+  const pastSlug = localStorage.getItem("jiko_last_slug");
+  if (pastSlug) {
+    const pl = document.getElementById("pastLink");
+    pl.style.display = "block";
+    pl.href = `/result/${pastSlug}`;
+  }
+</script>
+</body>
+</html>
