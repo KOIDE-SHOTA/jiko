@@ -309,5 +309,11 @@ def generate_ogp(adj1, adj2, character, message_text):
     for i in range(height):
         draw.line([(0, i), (width, i)], fill=(20, 25, 60))
     draw.rectangle([20, 20, width - 20, height - 20], outline=(212, 175, 55), width=2)
-    try:
-        font_large = ImageFont.truetype("/usr
+     try:
+        font_large = ImageFont.load_default()
+        font_medium = ImageFont.load_default()
+        font_small = ImageFont.load_default()
+    except Exception:
+        font_large = ImageFont.load_default()
+        font_medium = font_large
+        font_small = font_large
