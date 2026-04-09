@@ -64,6 +64,8 @@ def get_followup_prompt(q_index, user_answer):
                 "「その人たちとどんな話や過ごし方をすることが多い？」と深掘りしてください。1〜2文で。"
             )
     return f"「{user_answer}」という回答について、もう少し詳しく聞かせてもらえますか？"
+
+
 ADJECTIVE_LIST = """
 【対人・調和系】温かい、真っ直ぐな、聞き上手な、頼もしい、人懐っこい、謙虚な、お節介な、朗らかな、包容力のある、誠実な、気配り上手な、穏やかな、情熱的な、愛嬌のある、裏表のない、献身的な、凛とした、柔らかい、親身な、礼儀正しい
 【思考・分析系】鋭い、冷静な、思慮深い、合理的な、独創的な、ストイックな、ロジカルな、慎重な、好奇心旺盛な、マニアックな、粘り強い、先見の明がある、抜け目のない、現実的な、柔軟な、緻密な、本質を突く、知的な、疑り深い、多才な
@@ -99,8 +101,8 @@ CHARACTER_IMAGE_MAP = {
 
 SYSTEM_PROMPT_CHAT = (
     "あなたは就活生の自己分析を手伝うフレンドリーなAIアシスタントです。"
-    "日本語で、温かく・簡潔に（2〜4文）返答してください。"
-    "分析や評価はせず、自然な会話として深掘りしてください。"
+    "日本語で、温かく・簡潔に（1〜2文）で深掘り質問だけしてください。"
+    "フィードバックや評価はしないでください。"
 )
 
 SYSTEM_PROMPT_DIAGNOSE = (
@@ -137,7 +139,7 @@ def start():
     welcome = (
         f"よろしく、{nickname}さん！MBTIは{mbti}なんだね。\n\n"
         f"4つの質問に答えてもらうよ。気軽に話してくれると嬉しい😊\n\n"
-        f"**Q1. {first_q}**"
+        f"Q1. {first_q}"
     )
     return jsonify({"message": welcome, "question_index": 0, "total": TOTAL_QUESTIONS, "done": False})
 
@@ -155,7 +157,7 @@ def message():
         followup_prompt = get_followup_prompt(q_index, user_message)
         response = client.messages.create(
             model="claude-sonnet-4-20250514",
-            max_tokens=200,
+            max_tokens=150,
             system=SYSTEM_PROMPT_CHAT,
             messages=[{"role": "user", "content": followup_prompt}]
         )
@@ -168,7 +170,7 @@ def message():
         next_index = q_index + 1
         session["question_index"] = next_index
         if next_index >= TOTAL_QUESTIONS:
-            history.append({"role": "assistant", "content": "ありがとう、全部教えてくれて！診断してみよう✨"})
+            history.append({"role": "assistant", "content": "ありがとう！"})
             session["history"] = history
             return jsonify({
                 "message": "ありがとう、全部教えてくれて！準備ができたら「診断する」ボタンを押してね✨",
@@ -177,18 +179,7 @@ def message():
                 "done": True
             })
         next_q = QUESTIONS[next_index]
-        transition_prompt = (
-            f"就活生が深掘り質問に「{user_message}」と答えてくれました。"
-            f"一言で受け止めて、次の質問「{next_q}」に自然につなげてください。"
-            f"次の質問は **Q{next_index + 1}. {next_q}** という形式で最後に表示してください。"
-        )
-        response = client.messages.create(
-            model="claude-sonnet-4-20250514",
-            max_tokens=250,
-            system=SYSTEM_PROMPT_CHAT,
-            messages=[{"role": "user", "content": transition_prompt}]
-        )
-        reply = response.content[0].text
+        reply = f"Q{next_index + 1}. {next_q}"
         history.append({"role": "assistant", "content": reply})
         session["history"] = history
         return jsonify({
@@ -197,8 +188,6 @@ def message():
             "total": TOTAL_QUESTIONS,
             "done": False
         })
-
-
 @app.route("/diagnose")
 def diagnose():
     history = session.get("history", [])
