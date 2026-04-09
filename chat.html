@@ -12,8 +12,6 @@
       --bg-deep: #060b1a;
       --bg-mid: #0d1530;
       --bg-card: #111a38;
-      --bg-bubble-ai: #141f42;
-      --bg-bubble-user: #1a2a1a;
       --gold: #d4af37;
       --gold-light: #f0d060;
       --gold-dim: #8a7020;
@@ -24,9 +22,7 @@
       --border: rgba(212,175,55,0.2);
       --glow: 0 0 16px rgba(212,175,55,0.25);
     }
-
     * { margin: 0; padding: 0; box-sizing: border-box; }
-
     body {
       background: var(--bg-deep);
       color: var(--text-primary);
@@ -37,7 +33,6 @@
       flex-direction: column;
       overflow: hidden;
     }
-
     .header {
       background: var(--bg-mid);
       border-bottom: 1px solid var(--border);
@@ -46,11 +41,9 @@
       align-items: center;
       gap: 12px;
       flex-shrink: 0;
-      z-index: 10;
     }
     .header-icon {
-      width: 38px;
-      height: 38px;
+      width: 38px; height: 38px;
       background: var(--bg-card);
       border: 1px solid var(--gold);
       border-radius: 50%;
@@ -58,20 +51,13 @@
       align-items: center;
       justify-content: center;
       font-size: 18px;
-      box-shadow: var(--glow);
     }
-    .header-info { flex: 1; }
     .header-name {
       font-family: 'Cinzel', serif;
       font-size: 14px;
       color: var(--gold);
-      letter-spacing: 1px;
     }
-    .header-status {
-      font-size: 11px;
-      color: var(--text-dim);
-      letter-spacing: 1px;
-    }
+    .header-status { font-size: 11px; color: var(--text-dim); }
     .header-status .dot {
       display: inline-block;
       width: 6px; height: 6px;
@@ -80,10 +66,7 @@
       margin-right: 4px;
       animation: pulse 2s ease-in-out infinite;
     }
-    @keyframes pulse {
-      0%,100% { opacity: 1; } 50% { opacity: 0.3; }
-    }
-
+    @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
     .progress-bar {
       background: var(--bg-mid);
       border-bottom: 1px solid var(--border);
@@ -101,7 +84,6 @@
       background: linear-gradient(90deg, var(--gold-dim), var(--gold));
       border-radius: 2px;
       transition: width 0.5s ease;
-      box-shadow: 0 0 8px var(--gold);
     }
     .progress-text {
       font-size: 11px;
@@ -109,9 +91,7 @@
       text-align: right;
       margin-top: 4px;
       font-family: 'Cinzel', serif;
-      letter-spacing: 1px;
     }
-
     .messages {
       flex: 1;
       overflow-y: auto;
@@ -119,12 +99,7 @@
       display: flex;
       flex-direction: column;
       gap: 16px;
-      scroll-behavior: smooth;
     }
-    .messages::-webkit-scrollbar { width: 4px; }
-    .messages::-webkit-scrollbar-track { background: transparent; }
-    .messages::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 2px; }
-
     .msg-wrap {
       display: flex;
       gap: 10px;
@@ -135,13 +110,10 @@
       from { opacity: 0; transform: translateY(8px); }
       to { opacity: 1; transform: translateY(0); }
     }
-
     .msg-wrap.ai { align-self: flex-start; }
     .msg-wrap.user { align-self: flex-end; flex-direction: row-reverse; }
-
     .avatar {
-      width: 34px;
-      height: 34px;
+      width: 34px; height: 34px;
       border-radius: 50%;
       flex-shrink: 0;
       display: flex;
@@ -150,13 +122,8 @@
       font-size: 16px;
       border: 1px solid var(--gold);
       background: var(--bg-card);
-      box-shadow: var(--glow);
     }
-    .msg-wrap.user .avatar {
-      border-color: var(--green);
-      box-shadow: 0 0 10px rgba(74,154,90,0.3);
-    }
-
+    .msg-wrap.user .avatar { border-color: var(--green); }
     .bubble {
       padding: 12px 16px;
       border-radius: 12px;
@@ -165,23 +132,16 @@
       max-width: 340px;
     }
     .msg-wrap.ai .bubble {
-      background: var(--bg-bubble-ai);
+      background: #141f42;
       border: 1px solid var(--border);
       border-top-left-radius: 4px;
-      color: var(--text-primary);
     }
     .msg-wrap.user .bubble {
-      background: var(--bg-bubble-user);
+      background: #1a2a1a;
       border: 1px solid rgba(74,154,90,0.3);
       border-top-right-radius: 4px;
-      color: var(--text-primary);
     }
-
-    .typing-indicator {
-      display: flex;
-      gap: 5px;
-      padding: 4px 0;
-    }
+    .typing-indicator { display: flex; gap: 5px; padding: 4px 0; }
     .typing-dot {
       width: 7px; height: 7px;
       background: var(--gold-dim);
@@ -191,10 +151,9 @@
     .typing-dot:nth-child(2) { animation-delay: 0.2s; }
     .typing-dot:nth-child(3) { animation-delay: 0.4s; }
     @keyframes typingDot {
-      0%,60%,100% { transform: translateY(0); opacity: 0.4; }
-      30% { transform: translateY(-6px); opacity: 1; }
+      0%,60%,100%{transform:translateY(0);opacity:0.4;}
+      30%{transform:translateY(-6px);opacity:1;}
     }
-
     .diagnose-wrap {
       display: none;
       padding: 12px 20px 16px;
@@ -203,7 +162,7 @@
     .diagnose-btn {
       width: 100%;
       padding: 16px;
-      background: linear-gradient(135deg, #1a2a05 0%, #2a4a10 100%);
+      background: linear-gradient(135deg, #1a2a05, #2a4a10);
       border: 2px solid var(--gold);
       border-radius: 6px;
       color: var(--gold);
@@ -211,19 +170,7 @@
       font-family: 'Cinzel', serif;
       letter-spacing: 4px;
       cursor: pointer;
-      transition: all 0.3s;
-      box-shadow: var(--glow);
-      animation: pulseBtn 2s ease-in-out infinite;
     }
-    @keyframes pulseBtn {
-      0%,100% { box-shadow: 0 0 16px rgba(212,175,55,0.3); }
-      50% { box-shadow: 0 0 32px rgba(212,175,55,0.7); }
-    }
-    .diagnose-btn:hover {
-      background: linear-gradient(135deg, #2a4a10 0%, #3a6a18 100%);
-      transform: translateY(-2px);
-    }
-
     .input-area {
       background: var(--bg-mid);
       border-top: 1px solid var(--border);
@@ -234,7 +181,6 @@
       align-items: flex-end;
       flex-shrink: 0;
     }
-
     textarea {
       flex: 1;
       background: var(--bg-card);
@@ -249,17 +195,11 @@
       min-height: 44px;
       max-height: 120px;
       line-height: 1.6;
-      transition: border-color 0.2s, box-shadow 0.2s;
     }
-    textarea:focus {
-      border-color: var(--gold);
-      box-shadow: var(--glow);
-    }
+    textarea:focus { border-color: var(--gold); }
     textarea::placeholder { color: var(--text-dim); }
-
     .send-btn {
-      width: 44px;
-      height: 44px;
+      width: 44px; height: 44px;
       background: var(--gold);
       border: none;
       border-radius: 8px;
@@ -268,53 +208,38 @@
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
-      transition: all 0.2s;
       color: var(--bg-deep);
       font-size: 18px;
     }
-    .send-btn:hover { background: var(--gold-light); transform: scale(1.05); }
-    .send-btn:disabled { background: var(--text-dim); cursor: not-allowed; transform: none; }
+    .send-btn:disabled { background: var(--text-dim); cursor: not-allowed; }
   </style>
 </head>
 <body>
-
 <header class="header">
   <div class="header-icon">🔮</div>
-  <div class="header-info">
-    <p class="header-name">Cinzel — 賢者の問答</p>
-    <p class="header-status">
-      <span class="dot"></span>接続中
-    </p>
+  <div>
+    <p class="header-name">CINZEL — 賢者の問答</p>
+    <p class="header-status"><span class="dot"></span>接続中</p>
   </div>
 </header>
-
 <div class="progress-bar">
   <div class="progress-track">
     <div class="progress-fill" id="progressFill" style="width:0%"></div>
   </div>
   <p class="progress-text" id="progressText">Q 0 / 4</p>
 </div>
-
 <div class="messages" id="messages"></div>
-
 <div class="diagnose-wrap" id="diagnoseWrap">
-  <button class="diagnose-btn" onclick="goDiagnose()">
-    ⚔ 診断する ⚔
-  </button>
+  <button class="diagnose-btn" onclick="goDiagnose()">⚔ 診断する ⚔</button>
 </div>
-
 <div class="input-area" id="inputArea">
   <textarea id="userInput" placeholder="ここに入力..." rows="1"
     onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
   <button class="send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
 </div>
-
 <script>
-  const TOTAL_Q = 4;
-  let qIndex = 0;
   let done = false;
   let sending = false;
-
   const messagesEl = document.getElementById("messages");
   const progressFill = document.getElementById("progressFill");
   const progressText = document.getElementById("progressText");
@@ -323,42 +248,107 @@
   const userInput = document.getElementById("userInput");
   const sendBtn = document.getElementById("sendBtn");
 
-  window.addEventListener("DOMContentLoaded", () => {
+  window.onload = function() {
     const nickname = localStorage.getItem("jiko_nickname") || "あなた";
     const mbti = localStorage.getItem("jiko_mbti") || "";
     fetch("/api/start", {
       method: "POST",
       headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({ nickname, mbti })
+      body: JSON.stringify({nickname, mbti})
     })
     .then(r => r.json())
     .then(data => {
       appendAI(data.message);
       updateProgress(data.question_index, data.total);
       if (data.done) showDiagnoseBtn();
+    })
+    .catch(e => {
+      appendAI("接続エラーが発生しました。ページを更新してください。");
     });
-  });
+  };
 
   function appendAI(text) {
     const wrap = document.createElement("div");
     wrap.className = "msg-wrap ai";
-    wrap.innerHTML = `
-      <div class="avatar">🔮</div>
-      <div class="bubble">${formatText(text)}</div>
-    `;
+    wrap.innerHTML = '<div class="avatar">🔮</div><div class="bubble">' + formatText(text) + '</div>';
     messagesEl.appendChild(wrap);
     scrollBottom();
   }
-
   function appendUser(text) {
     const wrap = document.createElement("div");
     wrap.className = "msg-wrap user";
-    wrap.innerHTML = `
-      <div class="bubble">${escapeHtml(text)}</div>
-      <div class="avatar">⚔</div>
-    `;
+    wrap.innerHTML = '<div class="bubble">' + escapeHtml(text) + '</div><div class="avatar">⚔</div>';
     messagesEl.appendChild(wrap);
     scrollBottom();
   }
-
-  function appendTyping(
+  function appendTyping() {
+    const wrap = document.createElement("div");
+    wrap.className = "msg-wrap ai";
+    wrap.id = "typing";
+    wrap.innerHTML = '<div class="avatar">🔮</div><div class="bubble"><div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>';
+    messagesEl.appendChild(wrap);
+    scrollBottom();
+  }
+  function removeTyping() {
+    const t = document.getElementById("typing");
+    if (t) t.remove();
+  }
+  function updateProgress(index, total) {
+    const pct = Math.min((index / (total || 4)) * 100, 100);
+    progressFill.style.width = pct + "%";
+    progressText.textContent = "Q " + Math.min(index, total || 4) + " / " + (total || 4);
+  }
+  function showDiagnoseBtn() {
+    done = true;
+    diagnoseWrap.style.display = "block";
+    inputArea.style.display = "none";
+    scrollBottom();
+  }
+  function sendMessage() {
+    if (sending || done) return;
+    const text = userInput.value.trim();
+    if (!text) return;
+    appendUser(text);
+    userInput.value = "";
+    autoResize(userInput);
+    sendBtn.disabled = true;
+    sending = true;
+    appendTyping();
+    fetch("/api/message", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({message: text})
+    })
+    .then(r => r.json())
+    .then(data => {
+      removeTyping();
+      appendAI(data.message);
+      updateProgress(data.question_index, data.total);
+      if (data.done) showDiagnoseBtn();
+    })
+    .finally(() => {
+      sending = false;
+      sendBtn.disabled = false;
+      userInput.focus();
+    });
+  }
+  function goDiagnose() { window.location.href = "/diagnose"; }
+  function handleKey(e) {
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  }
+  function autoResize(el) {
+    el.style.height = "auto";
+    el.style.height = Math.min(el.scrollHeight, 120) + "px";
+  }
+  function scrollBottom() {
+    setTimeout(() => { messagesEl.scrollTop = messagesEl.scrollHeight; }, 50);
+  }
+  function formatText(text) {
+    return escapeHtml(text).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+  }
+  function escapeHtml(text) {
+    return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+</script>
+</body>
+</html>
