@@ -15,7 +15,7 @@ load_dotenv()
 SUPABASE_URL = "https://tqxrfbjzfuqeorgvndve.supabase.co"
 SUPABASE_KEY = "sb_publishable_Jayhk0qbNe3klwk55y1oaA_YqL8kSRV"
 
-app = Flask(__name__, template_folder=".")
+app = Flask(__name__, template_folder=".", static_folder="../static")
 app.secret_key = os.environ.get("SECRET_KEY", "jiko-secret-2024")
 
 client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
