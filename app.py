@@ -5,7 +5,7 @@ import io
 import os
 
 import requests
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw
 from flask import Flask, render_template, request, jsonify, session, send_file
 import anthropic
 from dotenv import load_dotenv
@@ -34,7 +34,7 @@ def get_followup_prompt(q_index, user_answer):
         return (
             f"就活生が「就職先の希望や譲れない条件」について「{user_answer}」と答えました。"
             "長期的に死守したいもの・今欲しているものについて、どちらかまたは両方をフレンドリーに深掘りしてください。"
-            "1〜2文で自然に聞いてください。可能であれば頻度や時間などの数値も自然に引き出してください。"
+            "1〜2文で自然に聞いてください。"
         )
     elif q_index == 1:
         if len(user_answer.strip()) < 5 or "ない" in user_answer or "わからない" in user_answer:
@@ -50,8 +50,7 @@ def get_followup_prompt(q_index, user_answer):
     elif q_index == 2:
         return (
             f"就活生が悩みへの対処について「{user_answer}」と答えました。"
-            "回答を読んで、「一人で抱え込むことが多い感じ？」など近そうな思考パターンを"
-            "自然に確認してください。1〜2文でフレンドリーに。"
+            "「一人で抱え込むことが多い感じ？」など近そうな思考パターンを自然に確認してください。1〜2文で。"
         )
     elif q_index == 3:
         if "いない" in user_answer or "少ない" in user_answer or "あまり" in user_answer:
@@ -65,8 +64,6 @@ def get_followup_prompt(q_index, user_answer):
                 "「その人たちとどんな話や過ごし方をすることが多い？」と深掘りしてください。1〜2文で。"
             )
     return f"「{user_answer}」という回答について、もう少し詳しく聞かせてもらえますか？"
-
-
 ADJECTIVE_LIST = """
 【対人・調和系】温かい、真っ直ぐな、聞き上手な、頼もしい、人懐っこい、謙虚な、お節介な、朗らかな、包容力のある、誠実な、気配り上手な、穏やかな、情熱的な、愛嬌のある、裏表のない、献身的な、凛とした、柔らかい、親身な、礼儀正しい
 【思考・分析系】鋭い、冷静な、思慮深い、合理的な、独創的な、ストイックな、ロジカルな、慎重な、好奇心旺盛な、マニアックな、粘り強い、先見の明がある、抜け目のない、現実的な、柔軟な、緻密な、本質を突く、知的な、疑り深い、多才な
@@ -136,7 +133,6 @@ def start():
     session["question_index"] = 0
     session["history"] = []
     session["state"] = "waiting_answer"
-
     first_q = QUESTIONS[0]
     welcome = (
         f"よろしく、{nickname}さん！MBTIは{mbti}なんだね。\n\n"
@@ -153,9 +149,7 @@ def message():
     q_index = session.get("question_index", 0)
     history = session.get("history", [])
     state = session.get("state", "waiting_answer")
-
     history.append({"role": "user", "content": user_message})
-
     if state == "waiting_answer":
         session["state"] = "waiting_followup"
         followup_prompt = get_followup_prompt(q_index, user_message)
@@ -169,12 +163,10 @@ def message():
         history.append({"role": "assistant", "content": reply})
         session["history"] = history
         return jsonify({"message": reply, "question_index": q_index, "total": TOTAL_QUESTIONS, "done": False})
-
     else:
         session["state"] = "waiting_answer"
         next_index = q_index + 1
         session["question_index"] = next_index
-
         if next_index >= TOTAL_QUESTIONS:
             history.append({"role": "assistant", "content": "ありがとう、全部教えてくれて！診断してみよう✨"})
             session["history"] = history
@@ -184,7 +176,6 @@ def message():
                 "total": TOTAL_QUESTIONS,
                 "done": True
             })
-
         next_q = QUESTIONS[next_index]
         transition_prompt = (
             f"就活生が深掘り質問に「{user_message}」と答えてくれました。"
@@ -213,9 +204,7 @@ def diagnose():
     history = session.get("history", [])
     mbti = session.get("mbti", "")
     nickname = session.get("nickname", "あなた")
-
     conv = "\n".join([f"{m['role']}: {m['content']}" for m in history])
-
     diagnose_prompt = f"""以下は就活生（MBTI: {mbti}）との会話です。
 
 {conv}
@@ -240,21 +229,18 @@ def diagnose():
   "short_term": "短期動機：今何が欲しいか（1〜2文）",
   "message": "だからこう動けるという示唆（1〜2文・前向きに締める）"
 }}"""
-
     response = client.messages.create(
         model="claude-sonnet-4-20250514",
         max_tokens=800,
         system=SYSTEM_PROMPT_DIAGNOSE,
         messages=[{"role": "user", "content": diagnose_prompt}]
     )
-    text = response.content[0].text
-    text = text.strip()
+    text = response.content[0].text.strip()
     if text.startswith("```"):
         text = text.split("```")[1]
         if text.startswith("json"):
             text = text[4:]
     text = text.strip().rstrip("```").strip()
-
     try:
         result = json.loads(text)
     except Exception:
@@ -269,11 +255,9 @@ def diagnose():
             "short_term": "まず一歩、動き出すきっかけが欲しい。",
             "message": "あなたの丁寧さが、きっと誰かの道しるべになる。"
         }
-
     char_name = result.get("character", "コンパス")
     result["image"] = CHARACTER_IMAGE_MAP.get(char_name, "compass.png")
     session["result"] = result
-
     slug = str(uuid.uuid4())[:8]
     try:
         requests.post(
@@ -297,23 +281,61 @@ def diagnose():
         )
     except Exception:
         pass
-
     session["slug"] = slug
     return render_template("result.html", result=result, nickname=nickname, slug=slug)
 
 
-def generate_ogp(adj1, adj2, character, message_text):
-    width, height = 1200, 630
-    img = Image.new("RGB", (width, height), color=(10, 15, 40))
-    draw = ImageDraw.Draw(img)
-    for i in range(height):
-        draw.line([(0, i), (width, i)], fill=(20, 25, 60))
-    draw.rectangle([20, 20, width - 20, height - 20], outline=(212, 175, 55), width=2)
-     try:
-        font_large = ImageFont.load_default()
-        font_medium = ImageFont.load_default()
-        font_small = ImageFont.load_default()
+@app.route("/ogp/<slug>.png")
+def ogp_image(slug):
+    try:
+        res = requests.get(
+            SUPABASE_URL + f"/rest/v1/result?slug=eq.{slug}",
+            headers={"apikey": SUPABASE_KEY},
+            timeout=5
+        )
+        data = res.json()
+        if data:
+            row = data[0]
+            img = Image.new("RGB", (1200, 630), color=(10, 15, 40))
+            draw = ImageDraw.Draw(img)
+            draw.rectangle([20, 20, 1180, 610], outline=(212, 175, 55), width=2)
+            buf = io.BytesIO()
+            img.save(buf, format="PNG")
+            buf.seek(0)
+            return send_file(buf, mimetype="image/png")
     except Exception:
-        font_large = ImageFont.load_default()
-        font_medium = font_large
-        font_small = font_large
+        pass
+    return "", 404
+
+
+@app.route("/result/<slug>")
+def result_page(slug):
+    try:
+        res = requests.get(
+            SUPABASE_URL + f"/rest/v1/result?slug=eq.{slug}",
+            headers={"apikey": SUPABASE_KEY},
+            timeout=5
+        )
+        data = res.json()
+        if not data:
+            return "結果が見つかりません", 404
+        row = data[0]
+        result = {
+            "adj1": row.get("adj1", ""),
+            "adj2": row.get("adj2", ""),
+            "character": row.get("character", ""),
+            "character_desc": row.get("character_desc", ""),
+            "strength": row.get("strength", ""),
+            "blind_spot": row.get("blind_spot", ""),
+            "long_term": row.get("long_term", ""),
+            "short_term": row.get("short_term", ""),
+            "message": row.get("message", ""),
+            "image": CHARACTER_IMAGE_MAP.get(row.get("character", ""), "compass.png"),
+        }
+        return render_template("result.html", result=result, nickname=row.get("nickname", "あなた"), slug=slug)
+    except Exception:
+        return "エラーが発生しました", 500
+
+
+if __name__ == "__main__":
+    app.run(debug=True, port=5000)
