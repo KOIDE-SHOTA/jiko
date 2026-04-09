@@ -1,49 +1,360 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>診断結果</title>
-<meta property="og:title" content="jikoキャラ診断">
-<meta property="og:image" content="/ogp/{{ slug }}.png">
-<meta property="og:description" content="{{ result.adj1 }}{{ result.adj2 }} {{ result.character }}">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>jikoキャラ診断 | {{ result.adj1 }}{{ result.adj2 }} {{ result.character }}</title>
+  <meta name="description" content="{{ result.message }}">
+  <meta property="og:title" content="{{ result.adj1 }}{{ result.adj2 }} {{ result.character }} | jikoキャラ診断">
+  <meta property="og:description" content="{{ result.message }}">
+  <meta property="og:image" content="/ogp/{{ slug }}.png">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Noto+Serif+JP:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-deep: #060b1a;
+      --bg-mid: #0d1530;
+      --bg-card: #111a38;
+      --gold: #d4af37;
+      --gold-light: #f0d060;
+      --gold-dim: #8a7020;
+      --amber: #c27c1a;
+      --text-primary: #f0e8cc;
+      --text-secondary: #b8a880;
+      --text-dim: #6a5f45;
+      --border: rgba(212,175,55,0.2);
+      --border-bright: rgba(212,175,55,0.5);
+      --glow: 0 0 20px rgba(212,175,55,0.3);
+      --glow-strong: 0 0 40px rgba(212,175,55,0.5);
+      --green: #4a9a5a;
+      --red: #c05040;
+    }
 
-<style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: sans-serif; background: linear-gradient(135deg, #fce4ec, #e8eaf6); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
-.card { background: white; border-radius: 24px; padding: 40px 32px; width: 90%; max-width: 480px; box-shadow: 0 8px 32px rgba(0,0,0,0.08); text-align: center; }
-.nickname { color: #aaa; font-size: 14px; margin-bottom: 8px; }
-.character { font-size: 26px; font-weight: 800; color: #ce93d8; margin-bottom: 24px; }
-.image { width: 120px; height: 120px; background: #f0e6f6; border-radius: 50%; margin: 0 auto 24px; display: flex; align-items: center; justify-content: center; font-size: 48px; }
-.section { text-align: left; margin-bottom: 20px; }
-.section h3 { font-size: 13px; color: #ce93d8; font-weight: 700; margin-bottom: 6px; }
-.section p { font-size: 14px; color: #555; line-height: 1.7; }
-.message-box { background: linear-gradient(135deg, #fce4ec, #e8eaf6); border-radius: 16px; padding: 16px; margin-top: 24px; font-size: 15px; color: #555; font-weight: 600; }
-</style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg-deep);
+      color: var(--text-primary);
+      font-family: 'Noto Serif JP', serif;
+      min-height: 100vh;
+      padding: 0 0 60px;
+    }
+
+    .stars { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+    .star {
+      position: absolute; border-radius: 50%; background: white;
+      animation: twinkle var(--dur,3s) ease-in-out infinite var(--delay,0s);
+    }
+    @keyframes twinkle {
+      0%,100%{opacity:0.15;transform:scale(1);}
+      50%{opacity:0.8;transform:scale(1.4);}
+    }
+
+    .top-bar {
+      position: relative; z-index: 1;
+      text-align: center;
+      padding: 32px 24px 0;
+    }
+    .top-bar .service-name {
+      font-family: 'Cinzel', serif;
+      font-size: 12px;
+      letter-spacing: 4px;
+      color: var(--gold-dim);
+      text-transform: uppercase;
+    }
+
+    .card {
+      position: relative;
+      z-index: 1;
+      max-width: 480px;
+      margin: 24px auto 0;
+      padding: 0 16px;
+    }
+
+    .character-sheet {
+      background: var(--bg-card);
+      border: 1px solid var(--border-bright);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: var(--glow-strong), 0 20px 60px rgba(0,0,0,0.6);
+      animation: sheetIn 0.8s ease both;
+    }
+    @keyframes sheetIn {
+      from { opacity: 0; transform: translateY(30px) scale(0.97); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .sheet-header {
+      background: linear-gradient(180deg, #1a2550 0%, #0d1530 100%);
+      padding: 28px 24px 20px;
+      text-align: center;
+      border-bottom: 1px solid var(--border-bright);
+      position: relative;
+    }
+    .sheet-header::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    }
+
+    .nickname-label {
+      font-size: 12px;
+      letter-spacing: 3px;
+      color: var(--text-dim);
+      font-family: 'Cinzel', serif;
+      margin-bottom: 6px;
+    }
+    .nickname-val {
+      font-size: 15px;
+      color: var(--text-secondary);
+      margin-bottom: 20px;
+    }
+
+    .char-image-wrap {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 20px;
+      border: 2px solid var(--gold);
+      border-radius: 50%;
+      overflow: hidden;
+      box-shadow: var(--glow-strong);
+      background: var(--bg-deep);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .char-image-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .char-image-placeholder { font-size: 48px; }
+
+    .char-name {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(22px, 5vw, 28px);
+      font-weight: 700;
+      color: var(--gold);
+      text-shadow: var(--glow-strong);
+      letter-spacing: 2px;
+      line-height: 1.3;
+      margin-bottom: 8px;
+    }
+    .adj-badge {
+      display: inline-block;
+      font-size: 13px;
+      color: var(--text-secondary);
+      background: rgba(212,175,55,0.1);
+      border: 1px solid rgba(212,175,55,0.3);
+      border-radius: 20px;
+      padding: 4px 14px;
+      margin: 0 3px 8px;
+    }
+
+    .char-desc {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.9;
+      margin-top: 10px;
+      text-align: left;
+      padding: 0 4px;
+    }
+
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border-bright), transparent);
+    }
+
+    .stat-block {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border);
+    }
+    .stat-block:last-child { border-bottom: none; }
+
+    .stat-label {
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      letter-spacing: 3px;
+      color: var(--gold-dim);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .stat-label .icon { font-size: 13px; }
+
+    .stat-value {
+      font-size: 14px;
+      color: var(--text-primary);
+      line-height: 1.9;
+    }
+
+    .message-block {
+      background: linear-gradient(135deg, rgba(212,175,55,0.08) 0%, rgba(194,124,26,0.08) 100%);
+      border: 1px solid var(--border-bright);
+      border-radius: 8px;
+      padding: 20px;
+      margin: 16px 24px 20px;
+    }
+    .message-label {
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      letter-spacing: 3px;
+      color: var(--gold-dim);
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .message-text {
+      font-size: 15px;
+      color: var(--gold-light);
+      line-height: 2;
+      font-style: italic;
+    }
+
+    .share-section {
+      padding: 0 16px;
+      margin-top: 20px;
+    }
+
+    .url-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .url-text {
+      flex: 1;
+      font-size: 13px;
+      color: var(--text-secondary);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-family: monospace;
+    }
+    .copy-btn {
+      padding: 8px 16px;
+      background: transparent;
+      border: 1px solid var(--gold);
+      border-radius: 4px;
+      color: var(--gold);
+      font-size: 12px;
+      font-family: 'Cinzel', serif;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+      flex-shrink: 0;
+      letter-spacing: 1px;
+    }
+    .copy-btn:hover { background: var(--gold); color: var(--bg-deep); }
+    .copy-btn.copied { background: var(--green); border-color: var(--green); color: white; }
+
+    .retry-btn {
+      display: block;
+      text-align: center;
+      width: 100%;
+      padding: 14px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-family: 'Noto Serif JP', serif;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+    .retry-btn:hover { border-color: var(--gold); color: var(--gold); }
+  </style>
 </head>
 <body>
-<div class="card">
-  <p class="nickname">{{ nickname }}さんの診断結果</p>
-  <div class="character">{{ result.adj1 }}{{ result.adj2 }} {{ result.character }}</div>
-  <div class="image">?</div>
-  <div class="section">
-    <h3>強み</h3>
-    <p>{{ result.strength }}</p>
-  </div>
-  <div class="section">
-    <h3>性格特徴</h3>
-    <p>{{ result.personality }}</p>
-  </div>
-  <div class="message-box">{{ result.message }}</div>
-</div>
-<div style="text-align:center;margin-top:24px">
-<p style="color:#aaa;font-size:13px">あなたの診断結果URL</p>
-<p style="color:#9575cd;font-size:13px">{{ request.host_url }}result/{{ slug }}</p>
-</div>
-<script>
-const slug = "{{ slug }}";
-if (slug) localStorage.setItem("lastSlug", slug);
-</script>
 
-</body>
-</html>
+<div class="stars" id="stars"></div>
+
+<div class="top-bar">
+  <p class="service-name">✦ jiko キャラ診断 ✦</p>
+</div>
+
+<div class="card">
+  <div class="character-sheet">
+
+    <div class="sheet-header">
+      <p class="nickname-label">ADVENTURER</p>
+      <p class="nickname-val">{{ nickname }} さん</p>
+
+      <div class="char-image-wrap">
+        {% if result.image %}
+          <img src="/static/{{ result.image }}"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
+               alt="{{ result.character }}">
+          <div class="char-image-placeholder" style="display:none">⚔️</div>
+        {% else %}
+          <div class="char-image-placeholder">⚔️</div>
+        {% endif %}
+      </div>
+
+      <div>
+        <span class="adj-badge">{{ result.adj1 }}</span>
+        <span class="adj-badge">{{ result.adj2 }}</span>
+      </div>
+      <h1 class="char-name">{{ result.character }}</h1>
+
+      {% if result.character_desc %}
+      <p class="char-desc">{{ result.character_desc }}</p>
+      {% endif %}
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="stats">
+      {% if result.strength %}
+      <div class="stat-block">
+        <p class="stat-label"><span class="icon">⚡</span> Strength — 強み</p>
+        <p class="stat-value">{{ result.strength }}</p>
+      </div>
+      {% endif %}
+
+      {% if result.blind_spot %}
+      <div class="stat-block">
+        <p class="stat-label"><span class="icon">🌑</span> Shadow — 盲点・弱み</p>
+        <p class="stat-value">{{ result.blind_spot }}</p>
+      </div>
+      {% endif %}
+
+      {% if result.long_term %}
+      <div class="stat-block">
+        <p class="stat-label"><span class="icon">🌟</span> Core — 長期動機</p>
+        <p class="stat-value">{{ result.long_term }}</p>
+      </div>
+      {% endif %}
+
+      {% if result.short_term %}
+      <div class="stat-block">
+        <p class="stat-label"><span class="icon">🎯</span> Now — 短期動機</p>
+        <p class="stat-value">{{ result.short_term }}</p>
+      </div>
+      {% endif %}
+    </div>
+
+    {% if result.message %}
+    <div class="message-block">
+      <p class="message-label">✦ Message</p>
+      <p class="message-text">「{{ result.message }}」</p>
+    </div>
+    {% endif %}
+
+  </div>
+
+  <div class="share-section">
+    <div class="url-box">
+      <span class="url-text" id="resultUrl"></span>
+      <button
