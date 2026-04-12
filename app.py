@@ -32,11 +32,16 @@ TOTAL_QUESTIONS = 4
 def should_followup_with_rescue(q_index, user_answer):
     if q_index not in [1, 3]:
         return False
+    question_map = {
+        1: "気づいたらできてた・続いてたことは何かある？",
+        3: "仲良くしてる人はどれくらいいる？どんな人が多い？"
+    }
+    question = question_map[q_index]
     response = client.messages.create(
         model="claude-sonnet-4-20250514",
         max_tokens=10,
-        system="ユーザーの回答が質問に対して具体的に答えられているかを判定してください。yes か no だけ返してください。",
-        messages=[{"role": "user", "content": user_answer}]
+        system="質問に対して何かしら答えようとしているか判定してください。答えようとしていればyes、答えられない・わからないと言っていればnoを返してください。yesかnoだけ返してください。",
+        messages=[{"role": "user", "content": f"質問：{question}\n回答：{user_answer}"}]
     )
     result = response.content[0].text.strip().lower()
     return result == "no"
@@ -52,8 +57,8 @@ def get_followup_prompt(q_index, user_answer):
     elif q_index == 1:
         if is_rescue:
             return (
-                "就活生が「気づいたらできてた・続いてたこと」についてあまり答えられませんでした。"
-                "「じゃあ、人より時間かけてでもやりたいと思えることってある？」と優しく聞いてください。"
+                "就活生が「気づいたらできてた・続いてたこと」について答えられませんでした。"
+                "共感表現（難しいよね・わかるよ等）は使わず、同じテーマを別の角度からすぐ聞き直してください。1文で。"
             )
         else:
             return (
@@ -68,8 +73,8 @@ def get_followup_prompt(q_index, user_answer):
     elif q_index == 3:
         if is_rescue:
             return (
-                "就活生があまり仲良くしてる人がいないと答えました。"
-                "「どんな話や過ごし方がしたいか」をフレンドリーに聞いてください。1〜2文で。"
+                "就活生が仲良くしてる人について答えられませんでした。"
+                "共感表現は使わず、どんな人と過ごしたいかを別の角度からすぐ聞き直してください。1文で。"
             )
         else:
             return (
@@ -130,6 +135,8 @@ SYSTEM_PROMPT_DIAGNOSE = (
     "各項目で同じ表現を繰り返さないでください。回答の引用も禁止です。"
     "必ず以下のJSON形式のみで返してください（前後に説明文・コードブロック不要）。"
 )
+
+
 @app.route("/")
 def index():
     session.clear()
@@ -204,8 +211,6 @@ def message():
             "total": TOTAL_QUESTIONS,
             "done": False
         })
-
-
 @app.route("/diagnose")
 def diagnose():
     history = session.get("history", [])
@@ -214,7 +219,6 @@ def diagnose():
     session_id = str(uuid.uuid4())
     conv = "\n".join([f"{m['role']}: {m['content']}" for m in history])
 
-    # Step1: 特徴抽出
     extract_prompt = f"""以下は就活生（MBTI: {mbti}）との会話です。
 
 {conv}
@@ -245,7 +249,6 @@ def diagnose():
     except Exception:
         traits = {"行動傾向": "不明", "判断基準": "不明", "対人距離": "不明", "ストレス癖": "不明"}
 
-    # Step2: 診断生成
     diagnose_prompt = f"""以下の特徴データを持つ就活生（MBTI: {mbti}）の診断結果を生成してください。
 
 【特徴データ】
@@ -304,7 +307,6 @@ def diagnose():
     session["result"] = result
     slug = str(uuid.uuid4())[:8]
 
-    # Supabase: resultテーブルに保存
     try:
         requests.post(
             SUPABASE_URL + "/rest/v1/result",
@@ -328,7 +330,6 @@ def diagnose():
     except Exception:
         pass
 
-    # Supabase: chat_logsテーブルに保存
     try:
         answers = [m["content"] for m in history if m["role"] == "user"]
         while len(answers) < 8:
@@ -408,8 +409,10 @@ def result_page(slug):
     return "結果が見つかりませんでした", 404
 
 
-if __name__ == "__main__":
-    app.run(debug=True)
 @app.route("/googlec77b838e118c8e2c.html")
 def google_verify():
     return render_template("googlec77b838e118c8e2c.html")
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
