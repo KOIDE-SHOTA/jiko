@@ -72,6 +72,21 @@
     .copy-btn.copied { background: var(--green); border-color: var(--green); color: white; }
     .retry-btn { display: block; text-align: center; width: 100%; padding: 14px; background: transparent; border: 1px solid var(--border); border-radius: 8px; color: var(--text-secondary); font-size: 13px; font-family: 'Noto Serif JP', serif; cursor: pointer; transition: all 0.2s; text-decoration: none; }
     .retry-btn:hover { border-color: var(--gold); color: var(--gold); }
+    .feedback-section { margin-top: 24px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+    .feedback-title { font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 3px; color: var(--gold-dim); text-transform: uppercase; margin-bottom: 14px; text-align: center; }
+    .feedback-btns { display: flex; gap: 8px; justify-content: center; margin-bottom: 16px; }
+    .feedback-btn { flex: 1; padding: 10px 0; background: transparent; border: 1px solid var(--border); border-radius: 8px; color: var(--text-secondary); font-size: 13px; font-family: 'Noto Serif JP', serif; cursor: pointer; transition: all 0.2s; }
+    .feedback-btn:hover { border-color: var(--gold); color: var(--gold); }
+    .feedback-btn.selected { border-color: var(--gold); color: var(--gold); background: rgba(212,175,55,0.1); }
+    .feedback-items { display: none; margin-bottom: 14px; }
+    .feedback-items.visible { display: block; }
+    .feedback-items-label { font-size: 12px; color: var(--text-dim); margin-bottom: 10px; }
+    .feedback-checkboxes { display: flex; flex-wrap: wrap; gap: 8px; }
+    .feedback-checkbox { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-secondary); cursor: pointer; }
+    .feedback-checkbox input { accent-color: var(--gold); }
+    .feedback-submit { display: block; width: 100%; padding: 12px; background: transparent; border: 1px solid var(--gold); border-radius: 8px; color: var(--gold); font-size: 13px; font-family: 'Cinzel', serif; cursor: pointer; transition: all 0.2s; }
+    .feedback-submit:hover { background: var(--gold); color: var(--bg-deep); }
+    .feedback-done { text-align: center; font-size: 13px; color: var(--text-secondary); display: none; }
   </style>
 </head>
 <body>
@@ -131,39 +146,4 @@
     {% if result.message %}
     <div class="message-block">
       <p class="message-label">✦ Message</p>
-      <p class="message-text">「{{ result.message }}」</p>
-    </div>
-    {% endif %}
-  </div>
-  <div class="share-section">
-    <div class="url-box">
-      <span class="url-text" id="resultUrl">読み込み中...</span>
-      <button class="copy-btn" id="copyBtn" onclick="copyUrl()">COPY</button>
-    </div>
-    <a href="/" class="retry-btn">↺ もう一度診断する</a>
-  </div>
-</div>
-<script>
-  const starsEl = document.getElementById("stars");
-  for (let i = 0; i < 80; i++) {
-    const s = document.createElement("div");
-    s.className = "star";
-    const size = Math.random() * 2.5 + 0.5;
-    s.style.cssText = `width:${size}px;height:${size}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--dur:${2+Math.random()*4}s;--delay:${Math.random()*5}s;`;
-    starsEl.appendChild(s);
-  }
-  const slug = "{{ slug }}";
-  const resultUrl = window.location.origin + "/result/" + slug;
-  document.getElementById("resultUrl").textContent = resultUrl;
-  if (slug) localStorage.setItem("jiko_last_slug", slug);
-  function copyUrl() {
-    navigator.clipboard.writeText(resultUrl).then(() => {
-      const btn = document.getElementById("copyBtn");
-      btn.textContent = "COPIED!";
-      btn.classList.add("copied");
-      setTimeout(() => { btn.textContent = "COPY"; btn.classList.remove("copied"); }, 2000);
-    });
-  }
-</script>
-</body>
-</html>
+    
