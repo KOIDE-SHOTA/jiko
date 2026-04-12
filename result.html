@@ -29,18 +29,9 @@
       --green: #4a9a5a;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      background: var(--bg-deep);
-      color: var(--text-primary);
-      font-family: 'Noto Serif JP', serif;
-      min-height: 100vh;
-      padding: 0 0 60px;
-    }
+    body { background: var(--bg-deep); color: var(--text-primary); font-family: 'Noto Serif JP', serif; min-height: 100vh; padding: 0 0 60px; }
     .stars { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
-    .star {
-      position: absolute; border-radius: 50%; background: white;
-      animation: twinkle var(--dur,3s) ease-in-out infinite var(--delay,0s);
-    }
+    .star { position: absolute; border-radius: 50%; background: white; animation: twinkle var(--dur,3s) ease-in-out infinite var(--delay,0s); }
     @keyframes twinkle { 0%,100%{opacity:0.15;} 50%{opacity:0.8;} }
     .top-bar { position: relative; z-index: 1; text-align: center; padding: 32px 24px 0; }
     .service-name { font-family: 'Cinzel', serif; font-size: 12px; letter-spacing: 4px; color: var(--gold-dim); text-transform: uppercase; }
@@ -99,9 +90,7 @@
       <p class="nickname-val">{{ nickname }} さん</p>
       <div class="char-image-wrap">
         {% if result.image %}
-          <img src="/static/{{ result.image }}"
-               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
-               alt="{{ result.character }}">
+          <img src="/static/{{ result.image }}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" alt="{{ result.character }}">
           <div class="char-image-placeholder" style="display:none">⚔️</div>
         {% else %}
           <div class="char-image-placeholder">⚔️</div>
@@ -146,4 +135,6 @@
     {% if result.message %}
     <div class="message-block">
       <p class="message-label">✦ Message</p>
-    
+      <p class="message-text">「{{ result.message }}」</p>
+    </div>
+    {% endif %}
