@@ -13,19 +13,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Noto+Serif+JP:wght@300;400;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-deep: #060b1a;
-      --bg-mid: #0d1530;
-      --bg-card: #111a38;
-      --gold: #d4af37;
-      --gold-light: #f0d060;
-      --gold-dim: #8a7020;
-      --text-primary: #f0e8cc;
-      --text-secondary: #b8a880;
-      --text-dim: #6a5f45;
-      --border: rgba(212,175,55,0.2);
-      --border-bright: rgba(212,175,55,0.5);
-      --glow: 0 0 20px rgba(212,175,55,0.3);
-      --glow-strong: 0 0 40px rgba(212,175,55,0.5);
+      --bg-deep: #060b1a; --bg-mid: #0d1530; --bg-card: #111a38;
+      --gold: #d4af37; --gold-light: #f0d060; --gold-dim: #8a7020;
+      --text-primary: #f0e8cc; --text-secondary: #b8a880; --text-dim: #6a5f45;
+      --border: rgba(212,175,55,0.2); --border-bright: rgba(212,175,55,0.5);
+      --glow: 0 0 20px rgba(212,175,55,0.3); --glow-strong: 0 0 40px rgba(212,175,55,0.5);
       --green: #4a9a5a;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -138,3 +130,76 @@
       <p class="message-text">「{{ result.message }}」</p>
     </div>
     {% endif %}
+  </div>
+  <div class="share-section">
+    <div class="url-box">
+      <span class="url-text" id="resultUrl">読み込み中...</span>
+      <button class="copy-btn" id="copyBtn" onclick="copyUrl()">COPY</button>
+    </div>
+    <a href="/" class="retry-btn">↺ もう一度診断する</a>
+  </div>
+  <div class="feedback-section">
+    <p class="feedback-title">✦ Feedback</p>
+    <div class="feedback-btns">
+      <button class="feedback-btn" onclick="selectScore(3, this)">しっくりきた👍</button>
+      <button class="feedback-btn" onclick="selectScore(2, this)">微妙🤔</button>
+      <button class="feedback-btn" onclick="selectScore(1, this)">ぜんぜん違う👎</button>
+    </div>
+    <div class="feedback-items" id="feedbackItems">
+      <p class="feedback-items-label">当てはまった項目を選んでください</p>
+      <div class="feedback-checkboxes">
+        <label class="feedback-checkbox"><input type="checkbox" value="strength"> 強み</label>
+        <label class="feedback-checkbox"><input type="checkbox" value="blind_spot"> 盲点・弱み</label>
+        <label class="feedback-checkbox"><input type="checkbox" value="long_term"> 長期動機</label>
+        <label class="feedback-checkbox"><input type="checkbox" value="short_term"> 短期動機</label>
+      </div>
+    </div>
+    <button class="feedback-submit" id="feedbackSubmit" onclick="submitFeedback()" style="display:none">送信する</button>
+    <p class="feedback-done" id="feedbackDone">フィードバックありがとう！</p>
+  </div>
+</div>
+<script>
+  const starsEl = document.getElementById("stars");
+  for (let i = 0; i < 80; i++) {
+    const s = document.createElement("div");
+    s.className = "star";
+    const size = Math.random() * 2.5 + 0.5;
+    s.style.cssText = `width:${size}px;height:${size}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--dur:${2+Math.random()*4}s;--delay:${Math.random()*5}s;`;
+    starsEl.appendChild(s);
+  }
+  const slug = "{{ slug }}";
+  const resultUrl = window.location.origin + "/result/" + slug;
+  document.getElementById("resultUrl").textContent = resultUrl;
+  if (slug) localStorage.setItem("jiko_last_slug", slug);
+  function copyUrl() {
+    navigator.clipboard.writeText(resultUrl).then(() => {
+      const btn = document.getElementById("copyBtn");
+      btn.textContent = "COPIED!";
+      btn.classList.add("copied");
+      setTimeout(() => { btn.textContent = "COPY"; btn.classList.remove("copied"); }, 2000);
+    });
+  }
+  let selectedScore = null;
+  function selectScore(score, el) {
+    selectedScore = score;
+    document.querySelectorAll(".feedback-btn").forEach(b => b.classList.remove("selected"));
+    el.classList.add("selected");
+    document.getElementById("feedbackItems").classList.add("visible");
+    document.getElementById("feedbackSubmit").style.display = "block";
+  }
+  function submitFeedback() {
+    const matched = Array.from(document.querySelectorAll(".feedback-checkbox input:checked")).map(i => i.value);
+    fetch("/api/feedback", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({slug: slug, score: selectedScore, matched_items: matched})
+    }).then(() => {
+      document.querySelector(".feedback-btns").style.display = "none";
+      document.getElementById("feedbackItems").style.display = "none";
+      document.getElementById("feedbackSubmit").style.display = "none";
+      document.getElementById("feedbackDone").style.display = "block";
+    });
+  }
+</script>
+</body>
+</html>
